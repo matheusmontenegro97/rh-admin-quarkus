@@ -1,11 +1,18 @@
 package ifpe.br.com.repository.impl;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import ifpe.br.com.config.CargoCodec;
+import ifpe.br.com.config.EnderecoCodec;
+import ifpe.br.com.config.FuncionarioCodec;
 import ifpe.br.com.model.Funcionario;
 import ifpe.br.com.repository.FuncionarioRepository;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,8 +33,19 @@ public class FuncionarioRepositoryImpl implements FuncionarioRepository {
         this.mongoClient = mongoClient;
     }
 
-    private MongoCollection<Funcionario> getCollection() {
-        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus", Funcionario.class);
+    public MongoCollection<Funcionario> getCollection() {
+        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistries.fromProviders(
+                        PojoCodecProvider.builder().automatic(true)
+                                .register(EnderecoCodec.class)
+                                .register(CargoCodec.class)
+                                .register(FuncionarioCodec.class)
+                                .build()
+                )
+        );
+        return mongoClient.getDatabase("rhadmin-spring").getCollection("funcionarios", Funcionario.class)
+                .withCodecRegistry(pojoCodecRegistry);
     }
 
     @Override
@@ -43,8 +61,8 @@ public class FuncionarioRepositoryImpl implements FuncionarioRepository {
     @Override
     public Funcionario updateFuncionario(String codigoFuncionario, Funcionario funcionario) {
 
-            getCollection().replaceOne(Filters.eq("codigoFuncionario", codigoFuncionario), funcionario);
-            return funcionario;
+        getCollection().replaceOne(Filters.eq("codigoFuncionario", codigoFuncionario), funcionario);
+        return funcionario;
     }
 
     @Override
@@ -53,7 +71,7 @@ public class FuncionarioRepositoryImpl implements FuncionarioRepository {
 
         FindIterable<Funcionario> funcionarioFindIterable = getCollection().find();
 
-        for(Funcionario funcionario : funcionarioFindIterable){
+        for (Funcionario funcionario : funcionarioFindIterable) {
             funcionarios.add(funcionario);
         }
 

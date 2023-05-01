@@ -148,6 +148,7 @@
           <excludes>
             <exclude>ifpe/br/com/exceptions/**</exclude>
             <exclude>ifpe/br/com/model/**</exclude>
+            <exclude>ifpe/br/com/config/**</exclude>
           </excludes>
         </configuration>
       </plugin>

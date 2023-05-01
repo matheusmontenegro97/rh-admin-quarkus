@@ -24,10 +24,10 @@ import static org.mockito.Mockito.when;
 public class FuncionarioControllerTest {
 
     @Mock
-    FuncionarioRepository funcionarioRepository;
+    private FuncionarioRepository funcionarioRepository;
 
     @InjectMocks
-    FuncionarioController funcionarioController;
+    private FuncionarioController funcionarioController;
 
     @Test
     void getFuncionariosSuccessTest() throws JsonProcessingException {

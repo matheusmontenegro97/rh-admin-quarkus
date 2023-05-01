@@ -8,6 +8,18 @@ public class Endereco {
     private String cidade;
     private String estado;
 
+    public Endereco() {
+    }
+
+    public Endereco(String cep, String rua, String numero, String bairro, String cidade, String estado) {
+        this.cep = cep;
+        this.rua = rua;
+        this.numero = numero;
+        this.bairro = bairro;
+        this.cidade = cidade;
+        this.estado = estado;
+    }
+
     public String getCep() {
         return cep;
     }

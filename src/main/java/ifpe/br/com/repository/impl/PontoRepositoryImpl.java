@@ -1,11 +1,16 @@
 package ifpe.br.com.repository.impl;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
+import ifpe.br.com.config.PontoCodec;
 import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Ponto;
 import ifpe.br.com.repository.FuncionarioRepository;
 import ifpe.br.com.repository.PontoRepository;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,8 +30,17 @@ public class PontoRepositoryImpl implements PontoRepository {
         this.funcionarioRepository = funcionarioRepository;
     }
 
-    private MongoCollection<Ponto> getCollection() {
-        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus", Ponto.class);
+    public MongoCollection<Ponto> getCollection() {
+        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistries.fromProviders(
+                        PojoCodecProvider.builder().automatic(true)
+                                .register(PontoCodec.class)
+                                .build()
+                )
+        );
+        return mongoClient.getDatabase("rhadmin-spring").getCollection("ponto", Ponto.class)
+                .withCodecRegistry(pojoCodecRegistry);
     }
 
     public Ponto savePonto(Ponto ponto) throws Exception {

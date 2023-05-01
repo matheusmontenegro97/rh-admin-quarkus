@@ -1,13 +1,10 @@
 package ifpe.br.com.model;
 
-import org.bson.types.ObjectId;
-
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Ponto {
-    private ObjectId objectId;
     private String codigoPonto;
     private String codigoFuncionario;
     private LocalTime horaEntradaTrabalho;
@@ -17,13 +14,17 @@ public class Ponto {
     @JsonbDateFormat("yyyy-MM-dd")
     private LocalDate data;
 
-
-    public ObjectId getObjectId() {
-        return objectId;
+    public Ponto() {
     }
 
-    public void setObjectId(ObjectId objectId) {
-        this.objectId = objectId;
+    public Ponto(String codigoPonto, String codigoFuncionario, LocalTime horaEntradaTrabalho, LocalTime horaSaidaAlmoco, LocalTime horaVoltaAlmoco, LocalTime horaSaidaTrabalho, LocalDate data) {
+        this.codigoPonto = codigoPonto;
+        this.codigoFuncionario = codigoFuncionario;
+        this.horaEntradaTrabalho = horaEntradaTrabalho;
+        this.horaSaidaAlmoco = horaSaidaAlmoco;
+        this.horaVoltaAlmoco = horaVoltaAlmoco;
+        this.horaSaidaTrabalho = horaSaidaTrabalho;
+        this.data = data;
     }
 
     public String getCodigoPonto() {

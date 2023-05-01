@@ -31,38 +31,38 @@ import static org.mockito.Mockito.*;
 public class AtestadoRepositoryImplTest {
 
     @Mock
-    MongoClient mongoClient;
+    private MongoClient mongoClient;
 
     @InjectMocks
-    AtestadoRepositoryImpl atestadoRepositoryImpl;
+    private AtestadoRepositoryImpl atestadoRepositoryImpl;
 
     @Mock
-    MongoDatabase database;
+    private MongoDatabase database;
 
 
     @Mock
-    MongoCollection<Atestado> coll;
+    private MongoCollection<Atestado> coll;
 
     @Mock
-    MongoCollection<GridFSFile> collGrid;
+    private MongoCollection<GridFSFile> collGrid;
 
     @Mock
-    MongoCollection<Document> collGridChunks;
+    private MongoCollection<Document> collGridChunks;
 
     @Mock
-    MongoCollection<Object> collGridObject;
+    private MongoCollection<Object> collGridObject;
 
     @Mock
-    FuncionarioRepositoryImpl funcionarioRepository;
+    private FuncionarioRepositoryImpl funcionarioRepository;
 
     @Mock
-    GridFSBucket gridFSBucket;
+    private GridFSBucket gridFSBucket;
 
     @Mock
-    ObjectId objectId;
+    private ObjectId objectId;
 
     @Mock
-    FindIterable<Object> findIterable;
+    private FindIterable<Object> findIterable;
 
     @Test
     public void saveAtestadoTest() throws Exception {
@@ -75,6 +75,7 @@ public class AtestadoRepositoryImplTest {
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Atestado.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(funcionarioRepository.findFuncionarioById(anyString())).thenReturn(func);
 
         File file = new File(atestado.getAtestado());
@@ -90,7 +91,6 @@ public class AtestadoRepositoryImplTest {
         when(collGridObject.find()).thenReturn(findIterable);
         when(findIterable.projection(any())).thenReturn(findIterable);
         when(findIterable.first()).thenReturn(new Object());
-        //when(collGridObject.find().projection(any()).first()).thenReturn(findIterable);
         when(collGridChunks.withCodecRegistry(any())).thenReturn(collGridChunks);
         when(database.getCollection(bucketName + ".files", GridFSFile.class)).thenReturn(collGrid);
         when(database.getCodecRegistry()).thenReturn(codecRegistry);

@@ -28,16 +28,16 @@ import static org.mockito.Mockito.*;
 class FuncionarioRepositoryImplTest {
 
     @Mock
-    MongoClient mongoClient;
+    private MongoClient mongoClient;
 
     @InjectMocks
-    FuncionarioRepositoryImpl funcionarioRepositoryImpl;
+    private FuncionarioRepositoryImpl funcionarioRepositoryImpl;
 
     @Mock
-    MongoDatabase database;
+    private MongoDatabase database;
 
     @Mock
-    MongoCollection<Funcionario> coll;
+    private MongoCollection<Funcionario> coll;
 
     @Mock
     private FindIterable<Funcionario> findIterable;
@@ -58,6 +58,7 @@ class FuncionarioRepositoryImplTest {
     void saveFuncionarioTest(){
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
 
         Funcionario func = new Funcionario();
         func.setDataNascimento(LocalDate.now());
@@ -77,6 +78,7 @@ class FuncionarioRepositoryImplTest {
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
 
         funcionarioRepositoryImpl.updateFuncionario(codigoFuncionario, func);
 
@@ -92,6 +94,7 @@ class FuncionarioRepositoryImplTest {
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(coll.find()).thenReturn(findIterable);
         when(findIterable.iterator()).thenReturn(cursor);
         when(cursor.hasNext())
@@ -116,6 +119,7 @@ class FuncionarioRepositoryImplTest {
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(coll.find(filter)).thenReturn(findIterable);
         when(findIterable.first()).thenReturn(func);
 
@@ -131,6 +135,7 @@ class FuncionarioRepositoryImplTest {
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(coll.deleteOne(filter)).thenReturn(DeleteResult.acknowledged(1));
 
         funcionarioRepositoryImpl.deleteFuncionarioById(codigoFuncionario);

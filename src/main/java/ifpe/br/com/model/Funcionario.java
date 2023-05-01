@@ -1,14 +1,12 @@
 package ifpe.br.com.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.bson.types.ObjectId;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Funcionario {
-    private ObjectId id;
     private String codigoFuncionario;
     private String nome;
     private String nomeSocial;
@@ -20,12 +18,19 @@ public class Funcionario {
     private Endereco endereco;
     private String email;
 
-    public ObjectId getId() {
-        return id;
+    public Funcionario() {
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public Funcionario(String codigoFuncionario, String nome, String nomeSocial, Cargo cargo, LocalDate dataNascimento, String cpf, String rg, Endereco endereco, String email) {
+        this.codigoFuncionario = codigoFuncionario;
+        this.nome = nome;
+        this.nomeSocial = nomeSocial;
+        this.cargo = cargo;
+        this.dataNascimento = dataNascimento;
+        this.cpf = cpf;
+        this.rg = rg;
+        this.endereco = endereco;
+        this.email = email;
     }
 
     public String getCodigoFuncionario() {

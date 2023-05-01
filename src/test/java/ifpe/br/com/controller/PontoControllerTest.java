@@ -20,10 +20,10 @@ import static org.mockito.Mockito.when;
 public class PontoControllerTest {
 
     @Mock
-    PontoRepository pontoRepository;
+    private PontoRepository pontoRepository;
 
     @InjectMocks
-    PontoController pontoController;
+    private PontoController pontoController;
 
     @Test
     void savePontoSuccessTest() throws Exception {

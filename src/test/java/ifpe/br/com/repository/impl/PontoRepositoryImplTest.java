@@ -23,19 +23,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class PontoRepositoryImplTest {
     @Mock
-    MongoClient mongoClient;
+    private MongoClient mongoClient;
 
     @InjectMocks
-    PontoRepositoryImpl pontoRepositoryImpl;
+    private PontoRepositoryImpl pontoRepositoryImpl;
 
     @Mock
-    MongoDatabase database;
+    private MongoDatabase database;
 
     @Mock
-    MongoCollection<Ponto> coll;
+    private MongoCollection<Ponto> coll;
 
     @Mock
-    FuncionarioRepository funcionarioRepository;
+    private FuncionarioRepository funcionarioRepository;
 
     @BeforeEach
     void beforeEach(){
@@ -61,6 +61,7 @@ public class PontoRepositoryImplTest {
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
         when(database.getCollection(anyString(), eq(Ponto.class))).thenReturn(coll);
+        when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(funcionarioRepository.findFuncionarioById(codigoFuncionario)).thenReturn(func);
 
         pontoRepositoryImpl.savePonto(ponto);

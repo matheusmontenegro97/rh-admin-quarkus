@@ -1,13 +1,18 @@
 package ifpe.br.com.repository.impl;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
+import ifpe.br.com.config.AtestadoCodec;
 import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Atestado;
 import ifpe.br.com.repository.AtestadoRepository;
 import ifpe.br.com.repository.FuncionarioRepository;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -30,8 +35,17 @@ public class AtestadoRepositoryImpl implements AtestadoRepository {
         this.funcionarioRepository = funcionarioRepository;
     }
 
-    private MongoCollection<Atestado> getCollection() {
-        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus", Atestado.class);
+    public MongoCollection<Atestado> getCollection() {
+        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistries.fromProviders(
+                        PojoCodecProvider.builder().automatic(true)
+                                .register(AtestadoCodec.class)
+                                .build()
+                )
+        );
+        return mongoClient.getDatabase("rhadmin-spring").getCollection("atestado", Atestado.class)
+                .withCodecRegistry(pojoCodecRegistry);
     }
 
     private GridFSBucket getGridFSBuckets() {

@@ -8,12 +8,13 @@ public class Atestado {
     private String codigoFuncionario;
     private String atestado;
 
-    public Atestado(String codigoFuncionario, String atestado) {
-        this.codigoFuncionario = codigoFuncionario;
-        this.atestado = atestado;
+    public Atestado() {
     }
 
-    public Atestado() {
+    public Atestado(String codigoAtestado, String codigoFuncionario, String atestado) {
+        this.codigoAtestado = codigoAtestado;
+        this.codigoFuncionario = codigoFuncionario;
+        this.atestado = atestado;
     }
 
     public String getCodigoAtestado() {
