@@ -4,12 +4,10 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
-import ifpe.br.com.config.ObjectMapperCustom;
 import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Atestado;
 import ifpe.br.com.repository.AtestadoRepository;
 import ifpe.br.com.repository.FuncionarioRepository;
-import org.bson.Document;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -27,13 +25,13 @@ public class AtestadoRepositoryImpl implements AtestadoRepository {
     private final FuncionarioRepository funcionarioRepository;
 
     @Inject
-    public AtestadoRepositoryImpl(MongoClient mongoClient, ObjectMapperCustom om, FuncionarioRepository funcionarioRepository) {
+    public AtestadoRepositoryImpl(MongoClient mongoClient, FuncionarioRepository funcionarioRepository) {
         this.mongoClient = mongoClient;
         this.funcionarioRepository = funcionarioRepository;
     }
 
-    private MongoCollection<Document> getCollection() {
-        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus");
+    private MongoCollection<Atestado> getCollection() {
+        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus", Atestado.class);
     }
 
     private GridFSBucket getGridFSBuckets() {
@@ -52,11 +50,7 @@ public class AtestadoRepositoryImpl implements AtestadoRepository {
         InputStream targetStream = new FileInputStream(file);
         getGridFSBuckets().uploadFromStream(atestado.getCodigoAtestado(), targetStream);
 
-        Document document = new Document()
-                .append("codigoAtestado", atestado.getCodigoAtestado())
-                .append("codigoFuncionario", atestado.getCodigoFuncionario());
-
-        getCollection().insertOne(document);
+        getCollection().insertOne(atestado);
 
         return atestado;
     }

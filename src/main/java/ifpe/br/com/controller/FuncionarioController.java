@@ -1,6 +1,7 @@
 package ifpe.br.com.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Funcionario;
 import ifpe.br.com.repository.FuncionarioRepository;
 
@@ -34,7 +35,7 @@ public class FuncionarioController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Funcionario updateFuncionarios
-            (@PathParam("id") String id, Funcionario funcionario) throws JsonProcessingException {
+            (@PathParam("id") String id, Funcionario funcionario) throws FuncionarioNotFoundException {
         return funcionarioRepository.updateFuncionario(id, funcionario);
     }
 
@@ -49,7 +50,7 @@ public class FuncionarioController {
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteFuncionario(@PathParam("id") String id) {
-        funcionarioRepository.deleteFuncionarioById(id);
+    public String deleteFuncionario(@PathParam("id") String id) {
+        return funcionarioRepository.deleteFuncionarioById(id);
     }
 }

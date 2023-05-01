@@ -129,18 +129,27 @@
         <version>0.8.7</version>
         <executions>
           <execution>
+            <id>jacoco-prepare-agent</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
           </execution>
           <execution>
-            <id>report</id>
-            <phase>test</phase>
+            <id>jacoco-report</id>
             <goals>
               <goal>report</goal>
             </goals>
+            <phase>test</phase>
           </execution>
         </executions>
+        <configuration>
+          <dataFile>target/jacoco.exec</dataFile>
+          <outputDirectory>target/jacoco-ut</outputDirectory>
+          <excludes>
+            <exclude>ifpe/br/com/exceptions/**</exclude>
+            <exclude>ifpe/br/com/model/**</exclude>
+          </excludes>
+        </configuration>
       </plugin>
 
     </plugins>

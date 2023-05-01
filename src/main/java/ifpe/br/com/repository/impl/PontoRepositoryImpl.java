@@ -2,12 +2,10 @@ package ifpe.br.com.repository.impl;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import ifpe.br.com.config.ObjectMapperCustom;
 import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Ponto;
 import ifpe.br.com.repository.FuncionarioRepository;
 import ifpe.br.com.repository.PontoRepository;
-import org.bson.Document;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -22,13 +20,13 @@ public class PontoRepositoryImpl implements PontoRepository {
     private final FuncionarioRepository funcionarioRepository;
 
     @Inject
-    public PontoRepositoryImpl(MongoClient mongoClient, ObjectMapperCustom om, FuncionarioRepository funcionarioRepository) {
+    public PontoRepositoryImpl(MongoClient mongoClient, FuncionarioRepository funcionarioRepository) {
         this.mongoClient = mongoClient;
         this.funcionarioRepository = funcionarioRepository;
     }
 
-    private MongoCollection<Document> getCollection() {
-        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus");
+    private MongoCollection<Ponto> getCollection() {
+        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus", Ponto.class);
     }
 
     public Ponto savePonto(Ponto ponto) throws Exception {
@@ -38,16 +36,7 @@ public class PontoRepositoryImpl implements PontoRepository {
 
         ponto.setCodigoPonto(UUID.randomUUID().toString());
 
-        Document document = new Document()
-                .append("codigoPonto", ponto.getCodigoPonto())
-                .append("codigoFuncionario", ponto.getCodigoFuncionario())
-                .append("horaEntradaTrabalho", ponto.getHoraEntradaTrabalho())
-                .append("horaSaidaAlmoco", ponto.getHoraSaidaAlmoco())
-                .append("horaVoltaAlmoco", ponto.getHoraVoltaAlmoco())
-                .append("horaSaidaTrabalho", ponto.getHoraSaidaTrabalho())
-                .append("data", ponto.getData());
-
-        getCollection().insertOne(document);
+        getCollection().insertOne(ponto);
 
         return ponto;
     }

@@ -1,12 +1,11 @@
 package ifpe.br.com.repository.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import ifpe.br.com.config.ObjectMapperCustom;
+import com.mongodb.client.model.Filters;
 import ifpe.br.com.model.Funcionario;
 import ifpe.br.com.repository.FuncionarioRepository;
-import org.bson.Document;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,16 +20,14 @@ public class FuncionarioRepositoryImpl implements FuncionarioRepository {
 
     private final MongoClient mongoClient;
 
-    private final ObjectMapperCustom om;
 
     @Inject
-    public FuncionarioRepositoryImpl(MongoClient mongoClient, ObjectMapperCustom om) {
+    public FuncionarioRepositoryImpl(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        this.om = om;
     }
 
-    private MongoCollection<Document> getCollection() {
-        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus");
+    private MongoCollection<Funcionario> getCollection() {
+        return mongoClient.getDatabase("rhadmin-quarkus").getCollection("rhadmin-quarkus", Funcionario.class);
     }
 
     @Override
@@ -38,85 +35,42 @@ public class FuncionarioRepositoryImpl implements FuncionarioRepository {
 
         funcionario.setCodigoFuncionario(UUID.randomUUID().toString());
 
-        Document document = new Document()
-                .append("codigoFuncionario", funcionario.getCodigoFuncionario())
-                .append("nome", funcionario.getNome())
-                .append("nomeSocial", funcionario.getNomeSocial())
-                .append("dataNascimento", funcionario.getDataNascimento().toString())
-                .append("cargo", funcionario.getCargo())
-                .append("cpf", funcionario.getCpf())
-                .append("rg", funcionario.getRg())
-                .append("endereco", funcionario.getEndereco())
-                .append("email", funcionario.getEmail());
-
-        getCollection().insertOne(document);
+        getCollection().insertOne(funcionario);
 
         return funcionario;
     }
 
     @Override
     public Funcionario updateFuncionario(String codigoFuncionario, Funcionario funcionario) {
-        Document doc = findDocumentById(codigoFuncionario);
 
-        Document document = doc;
-        document.put("nome", funcionario.getNome());
-        document.put("nomeSocial", funcionario.getNomeSocial());
-        document.put("dataNascimento", funcionario.getDataNascimento().toString());
-        document.put("cargo", funcionario.getCargo());
-        document.put("cpf", funcionario.getCpf());
-        document.put("rg", funcionario.getRg());
-        document.put("endereco", funcionario.getEndereco());
-        document.put("email", funcionario.getEmail());
-
-        Document query = new Document();
-        query.append("codigoFuncionario", codigoFuncionario);
-
-        getCollection().replaceOne(query, document);
-
-        return funcionario;
+            getCollection().replaceOne(Filters.eq("codigoFuncionario", codigoFuncionario), funcionario);
+            return funcionario;
     }
 
     @Override
-    public List<Funcionario> findAll() throws JsonProcessingException {
+    public List<Funcionario> findAll() {
         List<Funcionario> funcionarios = new ArrayList<>();
 
-        getCollection().find().forEach(func -> {
-            try {
-                funcionarios.add(mapFuncionario(func));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        FindIterable<Funcionario> funcionarioFindIterable = getCollection().find();
+
+        for(Funcionario funcionario : funcionarioFindIterable){
+            funcionarios.add(funcionario);
+        }
 
         return funcionarios;
     }
 
     @Override
-    public Funcionario findFuncionarioById(String codigoFuncionario) throws JsonProcessingException {
-        Document document = findDocumentById(codigoFuncionario);
+    public Funcionario findFuncionarioById(String codigoFuncionario) {
+        Funcionario funcionario =
+                getCollection().find(eq("codigoFuncionario", codigoFuncionario)).first();
 
-        return mapFuncionario(document);
+        return funcionario;
     }
 
     @Override
-    public void deleteFuncionarioById(String codigoFuncionario) {
-        Document query = new Document();
-        query.append("codigoFuncionario", codigoFuncionario);
-
-        getCollection().deleteOne(query);
-    }
-
-    private Document findDocumentById(String codigoFuncionario) {
-        Document document =
-                getCollection().find(eq("codigoFuncionario", codigoFuncionario)).first();
-
-        return document;
-    }
-
-    private Funcionario mapFuncionario(Document document) throws JsonProcessingException {
-        String json = document.toJson();
-        Funcionario funcionario = om.getObjectMapper().readValue(json, Funcionario.class);
-
-        return funcionario;
+    public String deleteFuncionarioById(String codigoFuncionario) {
+        getCollection().deleteOne(eq("codigoFuncionario", codigoFuncionario));
+        return codigoFuncionario;
     }
 }

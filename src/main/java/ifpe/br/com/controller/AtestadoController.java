@@ -13,7 +13,7 @@ public class AtestadoController {
     AtestadoRepository atestadoRepository;
 
     @POST
-    public Atestado savePonto(Atestado atestado) throws Exception {
+    public Atestado saveAtestado(Atestado atestado) throws Exception {
         return atestadoRepository.saveAtestado(atestado);
     }
 }
