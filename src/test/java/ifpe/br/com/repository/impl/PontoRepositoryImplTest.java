@@ -3,6 +3,7 @@ package ifpe.br.com.repository.impl;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Funcionario;
 import ifpe.br.com.model.Ponto;
 import ifpe.br.com.repository.FuncionarioRepository;
@@ -16,12 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PontoRepositoryImplTest {
+class PontoRepositoryImplTest {
     @Mock
     private MongoClient mongoClient;
 
@@ -67,6 +69,18 @@ public class PontoRepositoryImplTest {
         pontoRepositoryImpl.savePonto(ponto);
 
         verify(coll, times(1)).insertOne(ponto);
+    }
+
+    @Test
+    void savePontoErrorTest() {
+        String codigoFuncionario = UUID.randomUUID().toString();
+
+        Ponto ponto = new Ponto();
+        ponto.setCodigoFuncionario(codigoFuncionario);
+
+        when(funcionarioRepository.findFuncionarioById(any())).thenReturn(null);
+
+        assertThrows(FuncionarioNotFoundException.class, () -> pontoRepositoryImpl.savePonto(ponto));
     }
 
 }

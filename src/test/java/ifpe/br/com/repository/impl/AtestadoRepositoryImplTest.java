@@ -7,6 +7,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import ifpe.br.com.exceptions.FuncionarioNotFoundException;
 import ifpe.br.com.model.Atestado;
 import ifpe.br.com.model.Funcionario;
 import org.bson.Document;
@@ -23,12 +24,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AtestadoRepositoryImplTest {
+class AtestadoRepositoryImplTest {
 
     @Mock
     private MongoClient mongoClient;
@@ -65,7 +67,7 @@ public class AtestadoRepositoryImplTest {
     private FindIterable<Object> findIterable;
 
     @Test
-    public void saveAtestadoTest() throws Exception {
+    void saveAtestadoSuccessTest() throws Exception {
         Atestado atestado = new Atestado();
         atestado.setCodigoFuncionario("1");
         atestado.setAtestado("/C:/Users/mathe/Downloads/693876.jpg");
@@ -84,7 +86,6 @@ public class AtestadoRepositoryImplTest {
         when(database.getCollection(eq("fs.files"), eq(GridFSFile.class))).thenReturn(collGrid);
         when(database.getCollection(eq("fs.chunks"))).thenReturn(collGridChunks);
 
-        CodecRegistry codecRegistry = null;
         when(collGrid.withCodecRegistry(any())).thenReturn(collGrid);
         when(collGrid.withDocumentClass(any())).thenReturn(collGridObject);
         when(collGrid.withDocumentClass(any()).withReadPreference(any())).thenReturn(collGridObject);
@@ -93,7 +94,7 @@ public class AtestadoRepositoryImplTest {
         when(findIterable.first()).thenReturn(new Object());
         when(collGridChunks.withCodecRegistry(any())).thenReturn(collGridChunks);
         when(database.getCollection(bucketName + ".files", GridFSFile.class)).thenReturn(collGrid);
-        when(database.getCodecRegistry()).thenReturn(codecRegistry);
+        when(database.getCodecRegistry()).thenReturn(null);
         when(database.getCollection(bucketName + ".chunks")).thenReturn(collGridChunks);
 
         getFilesCollection(database, bucketName);
@@ -102,6 +103,33 @@ public class AtestadoRepositoryImplTest {
         atestadoRepositoryImpl.saveAtestado(atestado);
 
         verify(coll, times(1)).insertOne(atestado);
+    }
+
+    @Test
+    void saveAtestadoErrorTest() throws Exception {
+        Atestado atestado = new Atestado();
+        atestado.setCodigoFuncionario("1");
+        atestado.setAtestado("/C:/Users/mathe/Downloads/693876.jpg");
+
+        String bucketName = "testBucket";
+
+        when(funcionarioRepository.findFuncionarioById(anyString())).thenReturn(null);
+
+        File file = new File(atestado.getAtestado());
+        InputStream targetStream = new FileInputStream(file);
+        lenient().when(gridFSBucket.uploadFromStream(atestado.getCodigoAtestado(), targetStream)).thenReturn(objectId);
+
+        when(collGrid.withCodecRegistry(any())).thenReturn(collGrid);
+        when(collGridChunks.withCodecRegistry(any())).thenReturn(collGridChunks);
+        when(database.getCollection(bucketName + ".files", GridFSFile.class)).thenReturn(collGrid);
+        when(database.getCodecRegistry()).thenReturn(null);
+        when(database.getCollection(bucketName + ".chunks")).thenReturn(collGridChunks);
+
+        getFilesCollection(database, bucketName);
+        getChunksCollection(database, bucketName);
+
+        assertThrows(FuncionarioNotFoundException.class, () -> atestadoRepositoryImpl.saveAtestado(atestado));
+
     }
 
     private static MongoCollection<GridFSFile> getFilesCollection(MongoDatabase database, String bucketName) {

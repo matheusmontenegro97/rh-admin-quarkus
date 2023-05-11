@@ -14,7 +14,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -43,10 +43,10 @@ public class PontoRepositoryImpl implements PontoRepository {
                 .withCodecRegistry(pojoCodecRegistry);
     }
 
-    public Ponto savePonto(Ponto ponto) throws Exception {
+    public Ponto savePonto(Ponto ponto) throws FuncionarioNotFoundException {
 
-        Optional.of(funcionarioRepository.findFuncionarioById(ponto.getCodigoFuncionario()))
-                .orElseThrow(() -> new FuncionarioNotFoundException(String.format("Funcionario com id: %s não encontrado", ponto.getCodigoFuncionario())));
+        if (Objects.isNull(funcionarioRepository.findFuncionarioById(ponto.getCodigoFuncionario())))
+            throw new FuncionarioNotFoundException(String.format("Funcionario com id: %s não encontrado", ponto.getCodigoFuncionario()));
 
         ponto.setCodigoPonto(UUID.randomUUID().toString());
 
