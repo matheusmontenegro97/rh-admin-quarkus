@@ -4,9 +4,7 @@ package ifpe.br.com.repository.impl;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.UpdateResult;
-import ifpe.br.com.model.Funcionario;
-import org.bson.BsonValue;
+import ifpe.br.com.model.Employee;
 import org.bson.conversions.Bson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,22 +23,22 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-class FuncionarioRepositoryImplTest {
+class EmployeeRepositoryImplTest {
 
     @Mock
     private MongoClient mongoClient;
 
     @InjectMocks
-    private FuncionarioRepositoryImpl funcionarioRepositoryImpl;
+    private EmployeeRepositoryImpl employeeRepositoryImpl;
 
     @Mock
     private MongoDatabase database;
 
     @Mock
-    private MongoCollection<Funcionario> coll;
+    private MongoCollection<Employee> coll;
 
     @Mock
-    private FindIterable<Funcionario> findIterable;
+    private FindIterable<Employee> findIterable;
 
     @BeforeEach
     void beforeEach(){
@@ -55,45 +53,45 @@ class FuncionarioRepositoryImplTest {
     }
 
     @Test
-    void saveFuncionarioTest(){
+    void saveEmployeeTest(){
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
-        when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(database.getCollection(anyString(), eq(Employee.class))).thenReturn(coll);
         when(coll.withCodecRegistry(any())).thenReturn(coll);
 
-        Funcionario func = new Funcionario();
-        func.setDataNascimento(LocalDate.now());
+        Employee func = new Employee();
+        func.setDateOfBirth(LocalDate.now());
 
-        funcionarioRepositoryImpl.saveFuncionario(func);
+        employeeRepositoryImpl.saveEmployee(func);
 
         verify(coll, times(1)).insertOne(func);
     }
 
     @Test
-    void updateFuncionarioTest(){
-        String codigoFuncionario = UUID.randomUUID().toString();
-        Bson filter = Filters.eq("codigoFuncionario", codigoFuncionario);
+    void updateEmployeeTest(){
+        String employeeCode = UUID.randomUUID().toString();
+        Bson filter = Filters.eq("employeeCode", employeeCode);
 
-        Funcionario func = new Funcionario();
-        func.setDataNascimento(LocalDate.now());
+        Employee employee = new Employee();
+        employee.setDateOfBirth(LocalDate.now());
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
-        when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(database.getCollection(anyString(), eq(Employee.class))).thenReturn(coll);
         when(coll.withCodecRegistry(any())).thenReturn(coll);
 
-        funcionarioRepositoryImpl.updateFuncionario(codigoFuncionario, func);
+        employeeRepositoryImpl.updateEmployee(employeeCode, employee);
 
-        verify(coll, times(1)).replaceOne(filter, func);
+        verify(coll, times(1)).replaceOne(filter, employee);
     }
 
     @Test
     void findAllTest() {
-        Funcionario func = new Funcionario();
-        func.setDataNascimento(LocalDate.now());
+        Employee employee = new Employee();
+        employee.setDateOfBirth(LocalDate.now());
 
         MongoCursor cursor = mock(MongoCursor.class);
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
-        when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(database.getCollection(anyString(), eq(Employee.class))).thenReturn(coll);
         when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(coll.find()).thenReturn(findIterable);
         when(findIterable.iterator()).thenReturn(cursor);
@@ -101,44 +99,44 @@ class FuncionarioRepositoryImplTest {
                 .thenReturn(true)
                 .thenReturn(false);
         when(cursor.next())
-                .thenReturn(func);
+                .thenReturn(employee);
 
-        List<Funcionario> funcionarioList = funcionarioRepositoryImpl.findAll();
+        List<Employee> employeeList = employeeRepositoryImpl.findAllEmployees();
 
-        assertFalse(funcionarioList.isEmpty());
+        assertFalse(employeeList.isEmpty());
     }
 
     @Test
-    void findFuncionarioByIdTest() {
-        String codigoFuncionario = UUID.randomUUID().toString();
-        Funcionario func = new Funcionario();
-        func.setCodigoFuncionario(codigoFuncionario);
-        func.setDataNascimento(LocalDate.now());
+    void findEmployeeByIdTest() {
+        String employeeCode = UUID.randomUUID().toString();
+        Employee emp = new Employee();
+        emp.setEmployeeCode(employeeCode);
+        emp.setDateOfBirth(LocalDate.now());
 
-        Bson filter = Filters.eq("codigoFuncionario", codigoFuncionario);
+        Bson filter = Filters.eq("employeeCode", employeeCode);
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
-        when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(database.getCollection(anyString(), eq(Employee.class))).thenReturn(coll);
         when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(coll.find(filter)).thenReturn(findIterable);
-        when(findIterable.first()).thenReturn(func);
+        when(findIterable.first()).thenReturn(emp);
 
-        Funcionario funcionario = funcionarioRepositoryImpl.findFuncionarioById(codigoFuncionario);
+        Employee employee = employeeRepositoryImpl.findEmployeeById(employeeCode);
 
-        assertEquals(func, funcionario);
+        assertEquals(emp, employee);
     }
 
     @Test
     void deleteByIdTest() {
-        String codigoFuncionario = UUID.randomUUID().toString();
-        Bson filter = Filters.eq("codigoFuncionario", codigoFuncionario);
+        String employeeCode = UUID.randomUUID().toString();
+        Bson filter = Filters.eq("employeeCode", employeeCode);
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
-        when(database.getCollection(anyString(), eq(Funcionario.class))).thenReturn(coll);
+        when(database.getCollection(anyString(), eq(Employee.class))).thenReturn(coll);
         when(coll.withCodecRegistry(any())).thenReturn(coll);
         when(coll.deleteOne(filter)).thenReturn(DeleteResult.acknowledged(1));
 
-        funcionarioRepositoryImpl.deleteFuncionarioById(codigoFuncionario);
+        employeeRepositoryImpl.deleteEmployeeById(employeeCode);
 
         verify(coll,times(1)).deleteOne(filter);
     }

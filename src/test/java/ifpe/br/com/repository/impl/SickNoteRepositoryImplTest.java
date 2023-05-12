@@ -7,9 +7,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import ifpe.br.com.exceptions.FuncionarioNotFoundException;
-import ifpe.br.com.model.Atestado;
-import ifpe.br.com.model.Funcionario;
+import ifpe.br.com.exceptions.EmployeeNotFoundException;
+import ifpe.br.com.model.SickNote;
+import ifpe.br.com.model.Employee;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -30,20 +30,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AtestadoRepositoryImplTest {
+class SickNoteRepositoryImplTest {
 
     @Mock
     private MongoClient mongoClient;
 
     @InjectMocks
-    private AtestadoRepositoryImpl atestadoRepositoryImpl;
+    private SickNoteRepositoryImpl sickNoteRepositoryImpl;
 
     @Mock
     private MongoDatabase database;
 
 
     @Mock
-    private MongoCollection<Atestado> coll;
+    private MongoCollection<SickNote> coll;
 
     @Mock
     private MongoCollection<GridFSFile> collGrid;
@@ -55,7 +55,7 @@ class AtestadoRepositoryImplTest {
     private MongoCollection<Object> collGridObject;
 
     @Mock
-    private FuncionarioRepositoryImpl funcionarioRepository;
+    private EmployeeRepositoryImpl employeeRepositoryImpl;
 
     @Mock
     private GridFSBucket gridFSBucket;
@@ -67,22 +67,22 @@ class AtestadoRepositoryImplTest {
     private FindIterable<Object> findIterable;
 
     @Test
-    void saveAtestadoSuccessTest() throws Exception {
-        Atestado atestado = new Atestado();
-        atestado.setCodigoFuncionario("1");
-        atestado.setAtestado("/C:/Users/mathe/Downloads/693876.jpg");
+    void saveSickNoteSuccessTest() throws Exception {
+        SickNote sickNote = new SickNote();
+        sickNote.setEmployeeCode("1");
+        sickNote.setSickNote("/C:/Users/mathe/Downloads/693876.jpg");
 
-        Funcionario func = new Funcionario();
+        Employee func = new Employee();
         String bucketName = "testBucket";
 
         when(mongoClient.getDatabase(anyString())).thenReturn(database);
-        when(database.getCollection(anyString(), eq(Atestado.class))).thenReturn(coll);
+        when(database.getCollection(anyString(), eq(SickNote.class))).thenReturn(coll);
         when(coll.withCodecRegistry(any())).thenReturn(coll);
-        when(funcionarioRepository.findFuncionarioById(anyString())).thenReturn(func);
+        when(employeeRepositoryImpl.findEmployeeById(anyString())).thenReturn(func);
 
-        File file = new File(atestado.getAtestado());
+        File file = new File(sickNote.getSickNote());
         InputStream targetStream = new FileInputStream(file);
-        lenient().when(gridFSBucket.uploadFromStream(atestado.getCodigoAtestado(), targetStream)).thenReturn(objectId);
+        lenient().when(gridFSBucket.uploadFromStream(sickNote.getSickNoteCode(), targetStream)).thenReturn(objectId);
         when(database.getCollection(eq("fs.files"), eq(GridFSFile.class))).thenReturn(collGrid);
         when(database.getCollection(eq("fs.chunks"))).thenReturn(collGridChunks);
 
@@ -100,24 +100,24 @@ class AtestadoRepositoryImplTest {
         getFilesCollection(database, bucketName);
         getChunksCollection(database, bucketName);
 
-        atestadoRepositoryImpl.saveAtestado(atestado);
+        sickNoteRepositoryImpl.saveSickNote(sickNote);
 
-        verify(coll, times(1)).insertOne(atestado);
+        verify(coll, times(1)).insertOne(sickNote);
     }
 
     @Test
-    void saveAtestadoErrorTest() throws Exception {
-        Atestado atestado = new Atestado();
-        atestado.setCodigoFuncionario("1");
-        atestado.setAtestado("/C:/Users/mathe/Downloads/693876.jpg");
+    void saveSickNoteErrorTest() throws Exception {
+        SickNote sickNote = new SickNote();
+        sickNote.setEmployeeCode("1");
+        sickNote.setSickNote("/C:/Users/mathe/Downloads/693876.jpg");
 
         String bucketName = "testBucket";
 
-        when(funcionarioRepository.findFuncionarioById(anyString())).thenReturn(null);
+        when(employeeRepositoryImpl.findEmployeeById(anyString())).thenReturn(null);
 
-        File file = new File(atestado.getAtestado());
+        File file = new File(sickNote.getSickNote());
         InputStream targetStream = new FileInputStream(file);
-        lenient().when(gridFSBucket.uploadFromStream(atestado.getCodigoAtestado(), targetStream)).thenReturn(objectId);
+        lenient().when(gridFSBucket.uploadFromStream(sickNote.getSickNoteCode(), targetStream)).thenReturn(objectId);
 
         when(collGrid.withCodecRegistry(any())).thenReturn(collGrid);
         when(collGridChunks.withCodecRegistry(any())).thenReturn(collGridChunks);
@@ -128,7 +128,7 @@ class AtestadoRepositoryImplTest {
         getFilesCollection(database, bucketName);
         getChunksCollection(database, bucketName);
 
-        assertThrows(FuncionarioNotFoundException.class, () -> atestadoRepositoryImpl.saveAtestado(atestado));
+        assertThrows(EmployeeNotFoundException.class, () -> sickNoteRepositoryImpl.saveSickNote(sickNote));
 
     }
 
