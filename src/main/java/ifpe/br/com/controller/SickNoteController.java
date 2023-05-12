@@ -10,7 +10,7 @@ import javax.ws.rs.Path;
 @Path("/rh/api/sickNote")
 public class SickNoteController {
     @Inject
-    SickNoteRepository sickNoteRepository;
+    private SickNoteRepository sickNoteRepository;
 
     @POST
     public SickNote saveSickNote(SickNote sickNote) throws Exception {

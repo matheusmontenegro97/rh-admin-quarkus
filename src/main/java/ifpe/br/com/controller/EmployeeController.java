@@ -14,7 +14,7 @@ import java.util.List;
 public class EmployeeController {
 
     @Inject
-    EmployeeRepository employeeRepository;
+    private EmployeeRepository employeeRepository;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

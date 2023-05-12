@@ -23,7 +23,7 @@ class ClockingControllerTest {
     private ClockingRepository clockingRepository;
 
     @InjectMocks
-    private PontoController pontoController;
+    private ClockingController clockingController;
 
     @Test
     void saveClockingSuccessTest() throws Exception {
@@ -37,7 +37,7 @@ class ClockingControllerTest {
 
         when(clockingRepository.saveClocking(any())).thenReturn(clocking);
 
-        Clocking response = pontoController.saveClocking(clocking);
+        Clocking response = clockingController.saveClocking(clocking);
 
         assertEquals(clocking, response);
     }

@@ -11,10 +11,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/rh/api/clocking")
-public class PontoController {
+public class ClockingController {
 
     @Inject
-    ClockingRepository clockingRepository;
+    private ClockingRepository clockingRepository;
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
