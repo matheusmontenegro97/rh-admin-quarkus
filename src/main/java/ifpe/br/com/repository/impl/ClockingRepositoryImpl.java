@@ -11,6 +11,7 @@ import ifpe.br.com.repository.EmployeeRepository;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -23,6 +24,9 @@ public class ClockingRepositoryImpl implements ClockingRepository {
     private final MongoClient mongoClient;
 
     private final EmployeeRepository employeeRepository;
+
+    @ConfigProperty(name = "quarkus.mongodb.database")
+    private String database;
 
     @Inject
     public ClockingRepositoryImpl(MongoClient mongoClient, EmployeeRepository employeeRepository) {
@@ -39,7 +43,7 @@ public class ClockingRepositoryImpl implements ClockingRepository {
                                 .build()
                 )
         );
-        return mongoClient.getDatabase("rhadmin-spring").getCollection("clocking", Clocking.class)
+        return mongoClient.getDatabase(database).getCollection("clocking", Clocking.class)
                 .withCodecRegistry(pojoCodecRegistry);
     }
 

@@ -13,6 +13,7 @@ import ifpe.br.com.repository.EmployeeRepository;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,6 +27,9 @@ import static com.mongodb.client.model.Filters.eq;
 public class EmployeeRepositoryImpl implements EmployeeRepository {
 
     private final MongoClient mongoClient;
+
+    @ConfigProperty(name = "quarkus.mongodb.database")
+    private String database;
 
 
     @Inject
@@ -44,7 +48,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
                                 .build()
                 )
         );
-        return mongoClient.getDatabase("rhadmin-spring").getCollection("employee", Employee.class)
+        return mongoClient.getDatabase(database).getCollection("employee", Employee.class)
                 .withCodecRegistry(pojoCodecRegistry);
     }
 

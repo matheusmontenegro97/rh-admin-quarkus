@@ -13,6 +13,7 @@ import ifpe.br.com.repository.SickNoteRepository;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,6 +30,9 @@ public class SickNoteRepositoryImpl implements SickNoteRepository {
 
     private final EmployeeRepository employeeRepository;
 
+    @ConfigProperty(name = "quarkus.mongodb.database")
+    private String database;
+
     @Inject
     public SickNoteRepositoryImpl(MongoClient mongoClient, EmployeeRepository employeeRepository) {
         this.mongoClient = mongoClient;
@@ -44,7 +48,7 @@ public class SickNoteRepositoryImpl implements SickNoteRepository {
                                 .build()
                 )
         );
-        return mongoClient.getDatabase("rhadmin-spring").getCollection("sickNote", SickNote.class)
+        return mongoClient.getDatabase(database).getCollection("sickNote", SickNote.class)
                 .withCodecRegistry(pojoCodecRegistry);
     }
 
